@@ -1,0 +1,16 @@
+no_kes: case_number
+plaintif__pemohon: plaintiff_applicant
+defendan: defendant
+kandungan_and_permohonan: content_and_application
+perihal_tindakan: case_subject
+nota: notes
+keputusan: decision
+jenis_pendengaran: hearing_type
+track_name: track_name  # Already in English
+judge_name: judge_name
+hearing_day: hearing_day
+hearing_date: hearing_date
+hearing_time: hearing_time
+court_level: court_level
+courtroom_detail: courtroom_detail
+court_location: court_location
