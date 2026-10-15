@@ -1,0 +1,46 @@
+FROM python:3.13.3-bullseye AS dev
+
+# Set up UTF-8 locale
+RUN apt-get update && \
+    apt-get install -y locales && \
+    sed -i '/en_US.UTF-8/s/^# //g' /etc/locale.gen && \
+    locale-gen
+
+ENV LANG=en_US.UTF-8 \
+    LANGUAGE=en_US:en \
+    LC_ALL=en_US.UTF-8
+
+# Base system deps
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    curl wget git coreutils build-essential \
+    libgl1-mesa-glx libglib2.0-0 libsm6 libxext6 libxrender1 \
+    && apt-get clean && rm -rf /var/lib/apt/lists/*
+
+# Install uv
+ADD https://astral.sh/uv/install.sh /install.sh
+RUN chmod +x /install.sh && /install.sh && rm /install.sh
+ENV PATH="/root/.local/bin:$PATH"
+
+# Set workspace dir to match devcontainer config
+WORKDIR /workspaces/oc-data-eng
+
+# Optional PYTHONPATH
+ENV PYTHONPATH="/workspaces/oc-data-eng/src"
+
+# Copy source
+COPY . .
+
+# Create virtual environment and install dependencies
+RUN uv venv && \
+    . .venv/bin/activate && \
+    uv pip install -e .[dev]
+
+# Append local .venv to PATH (runtime env will create this)
+ENV PATH="/workspaces/oc-data-eng/.venv/bin:$PATH"
+
+# Diagnostic output
+RUN echo "Container configured with .venv at /workspaces/oc-data-eng/.venv" && \
+    echo "PATH=$PATH" && which python || true
+
+# Idle to keep container alive
+CMD ["/usr/bin/tail", "-f", "/dev/null"]

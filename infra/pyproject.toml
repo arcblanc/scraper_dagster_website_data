@@ -1,0 +1,34 @@
+[project]
+name = "infra"
+version = "0.1.0"
+description = "Pulumi infrastructure for Dagster batch ETL deployment on AWS ECS using Fargate"
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+    "pulumi>=3.173.0",
+    "pulumi-aws>=6.81.0",
+    "pulumi-awsx>=0.6.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pre-commit>=3.8.0,<4.0.0",
+    "ruff>=0.11.0,<0.12.0",
+    "black>=24.8.0,<25.0.0",
+    "isort>=5.13.2,<6.0.0",
+    "mypy>=1.5.1,<2.0.0",          # for type checking
+]
+
+[tool.ruff.lint]
+ignore = [
+    "D204", "D100", "D101", "D102", "D103", "D104", "D105", "D107", "D205", "D401",
+    "TRY003", "FIX002", "TD002", "TD003", "ANN401","D213",
+]
+
+[tool.mypy]
+files = "."
+
+[scripts]
+lint = "ruff ."
+format = "black . && isort ."
+typecheck = "mypy ."

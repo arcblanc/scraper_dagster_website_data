@@ -1,0 +1,9 @@
+name: oc-data-eng-pulumi
+description: Infrastructure for deploying Dagster batch ETL on AWS ECS Fargate
+runtime:
+  name: python
+  options:
+    toolchain: uv
+    virtualenv: .venv
+backend:
+  url: s3://onecredit-data-eng-pulumi-state-malaysia

@@ -1,0 +1,32 @@
+[project]
+name = "scraper-dagster-website-data"
+version = "0.1.0"
+description = "Local company ETL and hearing parse, plus the Bursa and CTOS scrapers."
+requires-python = ">=3.11"
+dependencies = [
+    "dagster",
+    "pandas",
+    "pyarrow",
+    "duckdb",
+    "beautifulsoup4",
+    "lxml",
+    "numpy",
+    "pandera",
+    "pyyaml",
+]
+
+[project.optional-dependencies]
+dev = ["pytest"]
+analysis = ["scipy", "matplotlib", "jupyter", "nbclient", "ipykernel"]
+
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["src*", "infra*"]
+
+[tool.pytest.ini_options]
+pythonpath = [".", "src"]
+testpaths = ["tests"]

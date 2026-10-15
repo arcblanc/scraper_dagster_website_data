@@ -1,0 +1,51 @@
+{
+  // Development container configuration
+  "name": "oc-data-eng-dev",
+
+  // Container build settings
+  "build": {
+    "dockerfile": "Dockerfile.dev",
+    "context": "..",
+    "args": {},
+  },
+
+  // Workspace configuration
+  "workspaceFolder": "/workspaces/oc-data-eng",
+
+  // Development ports
+  "forwardPorts": [3000],  // Dagit UI port
+
+  // Post-creation setup
+  "postCreateCommand": "uv venv && uv pip install -e .[dev] && pre-commit install",
+  "postStartCommand": "pre-commit install && dagster dev",
+
+  // Ensures venv exists before VS Code scans the code
+  "updateContentCommand": "uv venv && uv pip install -e .[dev]",
+
+  // Environment configuration
+  "remoteEnv": {
+    "PYTHONPATH": "/workspaces/oc-data-eng/src",
+    "VIRTUAL_ENV": "/workspaces/oc-data-eng/.venv",
+    "PATH": "/workspaces/oc-data-eng/.venv/bin:${containerEnv:PATH}"
+  },
+
+  // VS Code integration
+  "customizations": {
+    "vscode": {
+      // Editor configuration
+      "settings": {
+        "terminal.integrated.defaultProfile.linux": "bash",
+        "python.defaultInterpreterPath": "/workspaces/oc-data-eng/.venv/bin/python",
+        "python.linting.enabled": true,
+        "python.formatting.provider": "black",
+        "python.linting.ruffEnabled": true
+      },
+      // Required extensions
+      "extensions": [
+        "ms-python.python",
+        "ms-python.vscode-pylance",
+        "charliermarsh.ruff"
+      ]
+    }
+  }
+}

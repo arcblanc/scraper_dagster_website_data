@@ -1,0 +1,53 @@
+# Version control
+.git
+.gitignore
+.gitattributes
+
+# Python
+__pycache__/
+*.py[cod]
+*.so
+.Python
+*.egg
+*.egg-info/
+dist/
+build/
+.pytest_cache/
+.ruff_cache/
+*.pyc
+
+# Virtual environments
+.venv/
+venv/
+.uv/
+
+
+# IDE and editor
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS and system
+.DS_Store
+**/.DS_Store
+
+# Data and logs
+**/company_data/
+**/test_results/
+**/chroma_db/
+*.pkl
+*.parquet
+*.log
+*.db
+event_logs/
+
+# Dagster
+.dagster/
+.tmp_dagster_home*/
+dagster_home/
+
+# Docker
+Dockerfile
+docker-compose*.yml
+.docker/

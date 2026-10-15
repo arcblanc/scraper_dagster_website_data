@@ -1,0 +1,72 @@
+###############################################################################
+# Production Dockerfile for Dagster Project
+#   • Python 3.13-slim (stable, small)
+#   • Reproducible deps with uv
+#   • Supports daemon or webserver via entrypoint
+###############################################################################
+
+FROM python:3.13-slim AS base
+
+# 1. System Setup
+ENV LANG=C.UTF-8 \
+    PYTHONUNBUFFERED=1 \
+    DAGSTER_HOME=/opt/dagster \
+    PYTHONPATH=/app/src
+
+WORKDIR /app
+
+# 2. Install system dependencies
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends \
+    build-essential \
+    libpq-dev \
+    gcc \
+    curl \
+    git \
+    nfs-common \
+    dnsutils \
+    netcat-openbsd \
+    && rm -rf /var/lib/apt/lists/*
+
+# 3. Install uv (recommended universal installer)
+RUN curl -Ls https://astral.sh/uv/install.sh | bash
+
+# Ensure uv is in PATH
+ENV PATH="/usr/local/bin:/root/.local/bin:$PATH"
+
+# 4. Copy dependency manifests first for caching
+COPY pyproject.toml uv.lock ./
+
+# 5. Copy application source (code is in src/)
+COPY src/ src/
+COPY helpers_sh/ helpers_sh/
+COPY README.md .
+COPY .env .env
+
+# 6. Install dependencies
+RUN uv sync
+RUN uv pip install . --system
+
+# 7. Setup DAGSTER_HOME and copy dagster configuration
+# Copy the dagster.yaml from the correct location
+COPY infra/dagster_home/dagster.yaml /opt/dagster-config/dagster.yaml
+
+# COPY the workspace.yaml from the correct location
+COPY infra/dagster_home/workspace.yaml /opt/dagster-config/workspace.yaml
+
+# Set the correct DAGSTER_HOME environment variable
+ENV DAGSTER_HOME=/opt/dagster
+
+# 8. Copy and setup entrypoint script
+COPY entrypoint.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh
+
+# 9. Expose Dagster ports
+EXPOSE 3000 4000 8793
+
+# 10. Define a healthcheck (conditional based on role)
+HEALTHCHECK --interval=60s --timeout=5s --start-period=120s --retries=5 \
+    CMD if [ "$DAGSTER_ROLE" = "webserver" ]; then curl -f http://localhost:3000/ || exit 1; else exit 0; fi
+
+# 11. Entrypoint handles launching webserver, daemon, etc.
+ENTRYPOINT ["/entrypoint.sh"]
